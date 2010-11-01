@@ -72,11 +72,17 @@ class Screen():
             if ch == curses.ERR:
                pass # Key was not pressed.
             elif ch == ord("l") or ch == ord("L"):
-                # Right
+                # Move right
                 figure.move_right()
             elif ch == ord("h") or ch == ord("H"):
-                # Left
+                # Move left
                 figure.move_left()
+            elif ch == ord("j") or ch == ord("J"):
+                # Rotate anticlockwise.
+                figure.rotate_anticlockwise()
+            elif ch == ord("k") or ch == ord("K"):
+                # Rotate clockwise.
+                figure.rotate_clockwise()
             elif ch == ord("q") or ch == ord("Q"):
                 # Quit
                 # TODO: Make sure that it is safe and correct.

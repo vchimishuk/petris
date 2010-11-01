@@ -33,8 +33,14 @@ class Petris():
 def main():
     petris = Petris()
     petris.init()
-    petris.run()
-    petris.destroy()
+    
+    try:
+        petris.run()
+    except Exception as e:
+        raise e
+    finally:
+        # petris.destroy()
+        pass
 
 
 if __name__ == '__main__':
