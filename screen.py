@@ -59,14 +59,8 @@ class Screen():
         figure = self.generate_figure()
         
         while True:
-            #self.glass.window.clear()
-            #self.glass.window.redrawwin()
-
             self.glass.clear()
             figure.draw()
-
-            #self.glass.window.refresh()
-
 
             ch = self.window.getch() #self.window.getch()
             if ch == curses.ERR:
@@ -88,4 +82,4 @@ class Screen():
                 # TODO: Make sure that it is safe and correct.
                 return
             
-            time.sleep(.1)
+            time.sleep(.05)

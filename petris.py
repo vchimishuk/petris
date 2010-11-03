@@ -36,12 +36,12 @@ def main():
     
     try:
         petris.run()
-    except Exception as e:
-        raise e
-    finally:
-        # petris.destroy()
-        pass
+    except Exception as err:
+        petris.destroy()
+        raise err
 
+    petris.destroy()
+    
 
 if __name__ == '__main__':
     main()
