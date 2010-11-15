@@ -1,4 +1,6 @@
+from glass import Glass
 from figurei import FigureI
+import math
 import curses
 import time
 
@@ -31,6 +33,8 @@ class Screen():
         self.window.refresh()
         self.window.nodelay(1)
 
+        self.glass = Glass(self)
+
 
     def destroy(self):
         """
@@ -49,7 +53,10 @@ class Screen():
         """
         Generate next figure to be fallen.
         """
-        return FigureI(self.glass)
+        # Figure shoud appears at the middle top of the glass.
+        y = 0
+        x = math.floor(self.glass.width / 2)
+        return FigureI(y, x)
 
 
     def main_loop(self):
@@ -60,26 +67,83 @@ class Screen():
         
         while True:
             self.glass.clear()
-            figure.draw()
+            figure.draw(self.glass.window, self.glass.width, self.glass.height)
 
-            ch = self.window.getch() #self.window.getch()
+            ch = self.window.getch()
             if ch == curses.ERR:
-               pass # Key was not pressed.
+                # Key was not pressed.
+                pass
             elif ch == ord("l") or ch == ord("L"):
                 # Move right
-                figure.move_right()
+                self._move_figure_right(figure)
             elif ch == ord("h") or ch == ord("H"):
                 # Move left
-                figure.move_left()
+                self._move_figure_left(figure)
             elif ch == ord("j") or ch == ord("J"):
                 # Rotate anticlockwise.
-                figure.rotate_anticlockwise()
+                self._rotate_figure_anticlockwise(figure)
             elif ch == ord("k") or ch == ord("K"):
                 # Rotate clockwise.
-                figure.rotate_clockwise()
+                self._rotate_figure_clockwise(figure)
             elif ch == ord("q") or ch == ord("Q"):
                 # Quit
                 # TODO: Make sure that it is safe and correct.
                 return
             
             time.sleep(.05)
+
+
+    def _move_figure_right(self, figure):
+        """
+        Move figure one position right.
+        """
+        if self._is_figure_right_moveable(figure):
+            figure.x += 1
+
+
+    def _move_figure_left(self, figure):
+        """
+        Move figure one position left.
+        """
+        if self._is_figure_left_moveable(figure):
+            figure.x -= 1
+
+
+    def _is_figure_right_moveable(self, figure):
+        """
+        Returns True if this figure can be moved right at least one step.
+        """
+        right_edge = figure.get_right_edge()
+        return right_edge < self.glass.width - 1
+
+
+    def _is_figure_left_moveable(self, figure):
+        """
+        Returns True if this figure can be moved left at least one step.
+        """
+        left_edge = figure.get_left_edge()
+        return left_edge > 0
+
+
+    def _rotate_figure_anticlockwise(self, figure):
+        """
+        Rotate figure contraclockwise.
+        """
+        i = figure.get_prev_sprite_index()
+        right_edge = figure.get_right_edge(i)
+        left_edge = figure.get_left_edge(i)
+
+        if right_edge < self.glass.width and left_edge >= 0:
+            figure.rotate_anticlockwise()
+
+
+    def _rotate_figure_clockwise(self, figure):
+        """
+        Rotate figure clockwise, if it can be rotated.
+        """
+        i = figure.get_next_sprite_index()
+        right_edge = figure.get_right_edge(i)
+        left_edge = figure.get_left_edge(i)
+
+        if right_edge < self.glass.width and left_edge >= 0:
+            figure.rotate_clockwise()

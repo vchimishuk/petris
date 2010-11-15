@@ -1,5 +1,4 @@
 from screen import Screen
-from glass import Glass
 
 
 class Petris():
@@ -12,8 +11,6 @@ class Petris():
         """
         self.screen = Screen()
         self.screen.init()
-        self.glass = Glass(self.screen)
-        self.screen.glass = self.glass
 
 
     def destroy(self):

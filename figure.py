@@ -3,32 +3,30 @@ import math
 
 
 class Figure:
-    def __init__(self, glass):
+    def __init__(self, y, x):
         """
         Constructor.
         """
         self.current_sprite_index = 0
-        self.glass = glass
-        # Put me at the middle top of the glass.
-        self.y = 0
-        self.x = math.floor(glass.width / 2)
+        self.y = y
+        self.x = x
 
 
-    def _is_window_point(self, y, x):
+    def _is_window_point(self, width, height, y, x):
         """
         Checks if point belongs to the glass window
         and character can be printed at its position.
         """
-        if x < 0 or x > self.glass.width \
-           or y < 0 or y > self.glass.height:
+        if x < 0 or x > width \
+           or y < 0 or y > height:
             return False
         else:
             return True
         
 
-    def draw(self):
+    def draw(self, window, width, height):
         """
-        Draw figure on the glass.
+        Draw figure on the given window.
         """
         current_sprite = self.sprites[self.current_sprite_index]
 
@@ -41,83 +39,32 @@ class Figure:
                     xx = x + c
                     yy = y + r
                     
-                    if self._is_window_point(yy, xx):
-                        self.glass.window.move(yy, xx)
-                        self.glass.window.echochar(curses.ACS_BLOCK)
+                    if self._is_window_point(width, height, yy, xx):
+                        window.move(yy, xx)
+                        window.echochar(curses.ACS_BLOCK)
 
     
     def rotate_clockwise(self):
         """
         Clockwise rotation.
         """
-        if self._is_clockwise_rotateable():
-            self.current_sprite_index = self._get_next_sprite_index(self.current_sprite_index)
+        self.current_sprite_index = self.get_next_sprite_index()
 
 
     def rotate_anticlockwise(self):
         """
-        Contraclockwise rotation.
+        Clockwise rotation.
         """
-        if self._is_anticlockwise_rotateable():
-            self.current_sprite_index = self._get_prev_sprite_index(self.current_sprite_index)
+        self.current_sprite_index = self.get_prev_sprite_index()
 
 
-    def move_right(self):
-        """
-        Move figure one position right.
-        """
-        if self._is_right_moveable():
-            self.x += 1
-
-
-    def move_left(self):
-        """
-        Move figure one position left.
-        """
-        if self._is_left_moveable():
-            self.x -= 1
-
-
-    def _is_right_moveable(self):
-        """
-        Returns True if this figure can be moved right at least one step.
-        """
-        right_edge = self._get_right_edge(self.current_sprite_index)
-        return right_edge < self.glass.width - 1
-
-
-    def _is_left_moveable(self):
-        """
-        Returns True if this figure can be moved left at least one step.
-        """
-        left_edge = self._get_left_edge(self.current_sprite_index)
-        return left_edge > 0
-
-
-    def _is_clockwise_rotateable(self):
-        """
-        Returns True if figure can be rotated clockwise.
-        """
-        next_sprite_index = self._get_next_sprite_index(self.current_sprite_index)
-        right_edge = self._get_right_edge(next_sprite_index)
-        left_edge = self._get_left_edge(next_sprite_index)
-        return right_edge < self.glass.width and left_edge >= 0
-
-
-    def _is_anticlockwise_rotateable(self):
-        """
-        Returns True if figure can be rotated anticlockwise.
-        """
-        prev_sprite_index = self._get_prev_sprite_index(self.current_sprite_index)
-        right_edge = self._get_right_edge(prev_sprite_index)
-        left_edge = self._get_left_edge(prev_sprite_index)
-        return right_edge < self.glass.width and left_edge >= 0
-        
-
-    def _get_right_edge(self, sprite_index):
+    def get_right_edge(self, sprite_index=None):
         """
         Returns X position of the right figure's point in the Glass' coordinates.
         """
+        if sprite_index == None:
+            sprite_index = self.current_sprite_index
+        
         sprite = self.sprites[sprite_index]
         
         fourth = third = 0
@@ -135,10 +82,13 @@ class Figure:
         return right_edge
 
 
-    def _get_left_edge(self, sprite_index):
+    def get_left_edge(self, sprite_index=None):
         """
         Returns X position of the left figure's point in the Glass' coordinates.
         """
+        if sprite_index == None:
+            sprite_index = self.current_sprite_index
+            
         sprite = self.sprites[sprite_index]
         
         first = second = 0
@@ -156,20 +106,27 @@ class Figure:
         return left_edge
 
 
-    def _get_next_sprite_index(self, i):
+    def get_next_sprite_index(self, current_index=None):
         """
         Returns next index for the given current index.
         """
-        i += 1
-        i %= 4 
-        return i
+        if current_index == None:
+            current_index = self.current_sprite_index
+            
+        current_index += 1
+        current_index %= 4 
+        return current_index
+    
 
-
-    def _get_prev_sprite_index(self, i):
+    def get_prev_sprite_index(self, current_index=None):
         """
         Returns previous index for the given current one.
         """
-        i -= 1
-        if i < 0:
-            i = 3
-        return i
+        if current_index == None:
+            current_index = self.current_sprite_index
+            
+        current_index -= 1
+        if current_index < 0:
+            current_index = 3
+            
+        return current_index
