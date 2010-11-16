@@ -40,8 +40,12 @@ class Figure:
                     yy = y + r
                     
                     if self._is_window_point(width, height, yy, xx):
-                        window.move(yy, xx)
-                        window.echochar(curses.ACS_BLOCK)
+                        try:
+                            window.move(yy, xx)
+                            window.echochar(curses.ACS_BLOCK)
+                        except:
+                            # We have to catch it for the last character in window.
+                            window.refresh()
 
     
     def rotate_clockwise(self):
@@ -130,3 +134,33 @@ class Figure:
             current_index = 3
             
         return current_index
+
+
+    def get_bottom_positions(self, sprite_index=None):
+        """
+        Returns list with y positions of bottom figure's
+        borrom points.
+        """
+        if sprite_index == None:
+            sprite_index = self.current_sprite_index
+            
+        sprite = self.sprites[sprite_index]
+
+        res = [-1, -1, -1, -1, -1]
+
+        for row in range(0, 5):
+            for col in range(0, 5):
+                if sprite[row][col] > 0:
+                    res[col] = self.y - 2 + row
+
+        return res
+
+
+    def get_sprite(self, sprite_index=None):
+        """
+        Returns sprite by index or current one if index is not specified.
+        """
+        if sprite_index == None:
+            sprite_index = self.current_sprite_index
+
+        return self.sprites[sprite_index]
