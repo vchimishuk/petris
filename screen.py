@@ -1,8 +1,6 @@
 from glass import Glass
-from figurei import FigureI
 import math
 import curses
-import time
 
 
 class Screen():
@@ -24,8 +22,12 @@ class Screen():
         self.stdscr.keypad(1)
         curses.curs_set(0)
 
-        self.width = 40 # 20
-        self.height = 30 # 24
+        self.width = 40 # 14
+        self.height = 30 # 20
+
+        self.level = 1
+        self.score = 0
+        self.lines = 0
 
         # Draw main window.
         self.window = curses.newwin(self.height, self.width, 0, 0)
@@ -49,56 +51,42 @@ class Screen():
         curses.curs_set(1)
 
 
-    def _generate_figure(self):
+    def move_figure_to_start(self, figure):
         """
-        Generate next figure to be fallen.
+        Move figure to start position.
+        Figure shoud appears at the middle top of the glass.
         """
-        # Figure shoud appears at the middle top of the glass.
-        y = 0
-        x = math.floor(self.glass.width / 2)
-        return FigureI(y, x)
+        figure.y = 0
+        figure.x = math.floor(self.glass.width / 2)
 
 
-    def main_loop(self):
+    def draw(self, figure):
         """
-        Main application loop, -- handling keyboard events, move figure down and so on.
+        Redraw the screen.
         """
-        figure = self._generate_figure()
+        x = self.glass.width + 4
+        self.window.move(10, x)
+        self.window.addstr("Score:" + "{0:>6}".format(self.score))
+        self.window.move(11, x)
+        self.window.addstr("Lines:" + "{0:>6}".format(self.lines))
+        self.window.move(12, x)
+        self.window.addstr("Level:" + "{0:>6}".format(self.level))
         
-        while True:
-            self.glass.clear()
-            self.glass.draw()
-            figure.draw(self.glass.window, self.glass.width, self.glass.height)
+        
+        self.glass.clear()
+        self.glass.draw()
+        
+        figure.draw(self.glass.window, self.glass.width, self.glass.height)
 
-            ch = self.window.getch()
-            if ch == curses.ERR:
-                # Key was not pressed.
-                pass
-            elif ch == ord("l") or ch == ord("L"):
-                # Move right
-                self._move_figure_right(figure)
-            elif ch == ord("h") or ch == ord("H"):
-                # Move left
-                self._move_figure_left(figure)
-            elif ch == ord("j") or ch == ord("J"):
-                # Rotate anticlockwise.
-                self._rotate_figure_anticlockwise(figure)
-            elif ch == ord("k") or ch == ord("K"):
-                # Rotate clockwise.
-                self._rotate_figure_clockwise(figure)
-            elif ch == ord("a") or ch == ord("A"):
-                # XXX: This is for temporary falling simulation.
-                if not self._move_figure_down(figure):
-                    figure = self._generate_figure()
-            elif ch == ord("q") or ch == ord("Q"):
-                # Quit
-                # TODO: Make sure that it is safe and correct.
-                return
-            
-            time.sleep(.05)
+        
+    def getch(self):
+        """
+        Return pressed key.
+        """
+        return self.window.getch()
+    
 
-
-    def _move_figure_down(self, figure):
+    def move_figure_down(self, figure):
         """
         Move figure down for one position, -- falling.
         Returns False if figure was joined to lees.
@@ -126,7 +114,7 @@ class Screen():
         return True
 
 
-    def _move_figure_right(self, figure):
+    def move_figure_right(self, figure):
         """
         Move figure one position right.
         """
@@ -134,7 +122,7 @@ class Screen():
             figure.x += 1
 
 
-    def _move_figure_left(self, figure):
+    def move_figure_left(self, figure):
         """
         Move figure one position left.
         """
@@ -160,7 +148,7 @@ class Screen():
         return left_edge > 0 and self._is_space_free(figure.y, figure.x - 1, sprite)
     
 
-    def _rotate_figure_anticlockwise(self, figure):
+    def rotate_figure_anticlockwise(self, figure):
         """
         Rotate figure contraclockwise.
         """
@@ -187,7 +175,7 @@ class Screen():
         figure.rotate_anticlockwise()
 
 
-    def _rotate_figure_clockwise(self, figure):
+    def rotate_figure_clockwise(self, figure):
         """
         Rotate figure clockwise, if it can be rotated.
         """
@@ -227,7 +215,9 @@ class Screen():
         return True
 
 
-    # XXX:
-    def _debug_msg(self, msg):
-        self.window.move(27, 1)
-        self.window.addstr(msg)
+    def delete_full_lines(self):
+        """
+        Remove full lines and returns their count.
+        """
+        return self.glass.delete_full_lines()
+

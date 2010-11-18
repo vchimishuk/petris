@@ -3,7 +3,7 @@ import math
 
 
 class Figure:
-    def __init__(self, y, x):
+    def __init__(self, y=0, x=0):
         """
         Constructor.
         """

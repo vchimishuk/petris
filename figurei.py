@@ -28,5 +28,5 @@ class FigureI(Figure):
     )
 
 
-    def __init__(self, y, x):
+    def __init__(self, y=0, x=0):
         Figure.__init__(self, y, x)

@@ -86,3 +86,48 @@ class Glass:
             return True
         
         return self.lees[y][x] == 0
+
+
+    def delete_full_lines(self):
+        """
+        Remove full lines and return score.
+        """
+        deleted_lines = 0
+        y = self.height - 1
+        while y >= 0:
+            if self._is_line_full(y):
+                self._remove_line(y)
+                deleted_lines += 1
+            else:
+                y -= 1
+
+        return deleted_lines
+                    
+
+    def _remove_line(self, y):
+        """
+        Remove full line. All cells above will be moved one position down.
+        """
+        for x in range(0, self.width):
+            # Empty this line.
+            self.lees[y][x] = 0
+
+            # Make upper lines "fall" down.
+            for yy in range(y, -1, -1):
+                if yy > 0:
+                    cel = self.lees[yy -1][x]
+                else:
+                    cel = 0
+                                        
+                self.lees[yy][x] = cel
+
+
+    def _is_line_full(self, y):
+        """
+        Returns True if specified line is full.
+        """
+        for cel in self.lees[y]:
+            if cel == 0:
+                return False
+
+        return True
