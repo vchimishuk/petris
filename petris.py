@@ -1,5 +1,6 @@
 import curses
 import time
+import math
 from screen import Screen
 from figurei import FigureI
 
@@ -29,6 +30,19 @@ class Petris():
         self.screen.destroy()
 
 
+    def _get_game_delay(self):
+        """
+        Returns real number of seconds for sleep time
+        between figure falling steps.
+        """
+        seconds = 0.080 + 0.800 * pow(0.75, self.level - 1)
+
+        if (seconds < 0.01):
+            seconds = 0.01
+
+        return seconds
+
+
     def _generate_figure(self):
         """
         Generate next figure to be fallen.
@@ -42,6 +56,7 @@ class Petris():
         """
         figure = None
         exiting = False
+        fast_falling = False
 
         while not exiting:
             # Create and initialize new figure.
@@ -50,6 +65,8 @@ class Petris():
                 self.screen.move_figure_to_start(figure)
 
             self.screen.draw(figure)
+
+            time.sleep(self._get_game_delay())
             
             # Keyboard input loop.
             ch = self.screen.getch()
@@ -58,10 +75,10 @@ class Petris():
                 # Key was not pressed.
                 pass
             elif ch == ord("l") or ch == ord("L"):
-                # Move right
+                # Move right.
                 self.screen.move_figure_right(figure)
             elif ch == ord("h") or ch == ord("H"):
-                # Move left
+                # Move left.
                 self.screen.move_figure_left(figure)
             elif ch == ord("j") or ch == ord("J"):
                 # Rotate anticlockwise.
@@ -69,24 +86,44 @@ class Petris():
             elif ch == ord("k") or ch == ord("K"):
                 # Rotate clockwise.
                 self.screen.rotate_figure_clockwise(figure)
-            elif ch == ord("a") or ch == ord("A"):
-                if not self.screen.move_figure_down(figure):
-                    lines = self.screen.delete_full_lines()
-                    score = self._lines_to_score(lines)
-
-                    self.lines += lines
-                    self.score += score
-                    # TODO: Check if we have to go to the new level.
-
-                    self.screen.score = self.score
-                    self.screen.lines = self.lines
-                    self.screen.level = self.level
-
-                    figure = None
+            elif ch == ord("f") or ch == ord("F"):
+                # Fast falling.
+                fast_falling = True
             elif ch == ord("q") or ch == ord("Q"):
+                # Quit.
                 return
 
-            time.sleep(.05)
+            if not self._fall_down(figure):
+                figure = None
+                fast_falling = False
+            else:
+                if fast_falling:
+                    while self._fall_down(figure):
+                        pass
+                    figure = None
+                    fast_falling = False
+
+
+    def _fall_down(self, figure):
+        """
+        Do one falling down step.
+        """
+        if not self.screen.move_figure_down(figure):
+            lines = self.screen.delete_full_lines()
+            score = self._lines_to_score(lines)
+
+            self.lines += lines
+            self.score += score
+
+            # TODO: Check if we have to go to the new level.
+
+            self.screen.score = self.score
+            self.screen.lines = self.lines
+            self.screen.level = self.level
+
+            return False
+        else:
+            return True
 
 
     def _lines_to_score(self, lines):
