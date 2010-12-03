@@ -57,6 +57,7 @@ class Petris():
         figure = None
         exiting = False
         fast_falling = False
+        paused = False
 
         while not exiting:
             # Create and initialize new figure.
@@ -89,9 +90,15 @@ class Petris():
             elif ch == ord("f") or ch == ord("F"):
                 # Fast falling.
                 fast_falling = True
+            elif ch == ord("p") or ch == ord("P"):
+                # Pause.
+                paused = not paused
             elif ch == ord("q") or ch == ord("Q"):
                 # Quit.
                 return
+
+            if paused:
+                continue
 
             if not self._fall_down(figure):
                 figure = None
@@ -115,7 +122,7 @@ class Petris():
             self.lines += lines
             self.score += score
 
-            # TODO: Check if we have to go to the new level.
+            self.level = int(1 + self.lines / 10)
 
             self.screen.score = self.score
             self.screen.lines = self.lines
