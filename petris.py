@@ -1,8 +1,15 @@
 import curses
 import time
 import math
+import random
 from screen import Screen
 from figurei import FigureI
+from figureo import FigureO
+from figurel import FigureL
+from figurej import FigureJ
+from figuret import FigureT
+from figures import FigureS
+from figurez import FigureZ
 
 
 class Petris():
@@ -21,6 +28,17 @@ class Petris():
         self.screen.init()
         self.screen.level = self.level
         self.screen.lines = self.lines
+
+        random.seed()
+
+        self.figures = []
+        self.figures.append(FigureI())
+        self.figures.append(FigureO())
+        self.figures.append(FigureL())
+        self.figures.append(FigureJ())
+        self.figures.append(FigureT())
+        self.figures.append(FigureS())
+        self.figures.append(FigureZ())
 
 
     def destroy(self):
@@ -47,7 +65,7 @@ class Petris():
         """
         Generate next figure to be fallen.
         """
-        return FigureI()
+        return self.figures[random.randint(0, len(self.figures) - 1)]
 
 
     def run(self):
