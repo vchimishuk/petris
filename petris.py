@@ -111,6 +111,10 @@ class Petris():
             elif ch == ord("p") or ch == ord("P"):
                 # Pause.
                 paused = not paused
+                if paused:
+                    self.screen.status = "PAUSED"
+                else:
+                    self.screen.status = None
             elif ch == ord("q") or ch == ord("Q"):
                 # Quit.
                 return

@@ -25,6 +25,9 @@ class Screen():
         self.width = 40 # 14
         self.height = 30 # 20
 
+        # Status message. Eg. "Paused"
+        self.status = None
+        
         self.level = 1
         self.score = 0
         self.lines = 0
@@ -64,14 +67,21 @@ class Screen():
         """
         Redraw the screen.
         """
-        x = self.glass.width + 4
-        self.window.move(10, x)
-        self.window.addstr("Score:" + "{0:>6}".format(self.score))
-        self.window.move(11, x)
-        self.window.addstr("Lines:" + "{0:>6}".format(self.lines))
-        self.window.move(12, x)
-        self.window.addstr("Level:" + "{0:>6}".format(self.level))
+        y_base = 10
+        x_base = self.glass.width + 4
         
+        self.window.move(y_base, x_base)
+        self.window.addstr("Score:" + "{0:>6}".format(self.score))
+        self.window.move(y_base + 1, x_base)
+        self.window.addstr("Lines:" + "{0:>6}".format(self.lines))
+        self.window.move(y_base + 2, x_base)
+        self.window.addstr("Level:" + "{0:>6}".format(self.level))
+
+        self.window.move(y_base + 4, x_base)
+        if self.status:
+            self.window.addstr(self.status, curses.A_BLINK)
+        else:
+            self.window.addstr(" " * (self.width - 1 - x_base))
         
         self.glass.clear()
         self.glass.draw()
