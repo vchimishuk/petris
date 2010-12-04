@@ -1,6 +1,7 @@
 from glass import Glass
 import math
 import curses
+import copy
 
 
 class Screen():
@@ -39,6 +40,8 @@ class Screen():
         self.window.nodelay(1)
 
         self.glass = Glass(self)
+
+        self.next_figure = None
 
 
     def destroy(self):
@@ -85,8 +88,29 @@ class Screen():
         
         self.glass.clear()
         self.glass.draw()
+
+        #
+        # Draw next picture preview.
+        #
+        # Clear place before.
+        for y in range(self.preview_figure.y - 2, self.preview_figure.y + 3):
+            for x in range(self.preview_figure.x - 2, self.preview_figure.x + 3):
+                self.window.move(y, x)
+                self.window.addstr(" ")
+        
+        self.preview_figure.draw(self.window, self.width, self.height)
+
         
         figure.draw(self.glass.window, self.glass.width, self.glass.height)
+
+
+    def set_next_figure(self, figure):
+        """
+        Set next falling figure for preview.
+        """
+        self.preview_figure = copy.copy(figure)
+        self.preview_figure.x = self.glass.width + 7
+        self.preview_figure.y = 5        
 
         
     def getch(self):

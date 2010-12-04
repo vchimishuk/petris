@@ -77,11 +77,16 @@ class Petris():
         fast_falling = False
         paused = False
 
+        next_figure = self._generate_figure()
+        
         while not exiting:
             # Create and initialize new figure.
             if not figure:
-                figure = self._generate_figure()
+                figure = next_figure
                 self.screen.move_figure_to_start(figure)
+
+                next_figure = self._generate_figure()
+                self.screen.set_next_figure(next_figure)
 
             self.screen.draw(figure)
 
