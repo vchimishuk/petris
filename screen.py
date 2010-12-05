@@ -23,8 +23,8 @@ class Screen():
         self.stdscr.keypad(1)
         curses.curs_set(0)
 
-        self.width = 40 # 14
-        self.height = 30 # 20
+        self.width = 28
+        self.height = 24
 
         # Status message. Eg. "Paused"
         self.status = None

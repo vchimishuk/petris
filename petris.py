@@ -76,6 +76,9 @@ class Petris():
         exiting = False
         fast_falling = False
         paused = False
+        sleep_time = 0
+        # Sleep with little portions to make keyboard more interactive.
+        sleep_chunk = 0.2
 
         next_figure = self._generate_figure()
         
@@ -90,7 +93,15 @@ class Petris():
 
             self.screen.draw(figure)
 
-            time.sleep(self._get_game_delay())
+            if sleep_time <= 0:
+                sleep_time = self._get_game_delay()
+
+            if sleep_time > sleep_chunk:
+                sleep_time -= sleep_chunk
+                time.sleep(sleep_chunk)
+            else:
+                time.sleep(sleep_time)
+                sleep_time = 0
             
             # Keyboard input loop.
             ch = self.screen.getch()
@@ -127,7 +138,7 @@ class Petris():
             if paused:
                 continue
 
-            if not self._fall_down(figure):
+            if sleep_time == 0 and not self._fall_down(figure):
                 figure = None
                 fast_falling = False
             else:
