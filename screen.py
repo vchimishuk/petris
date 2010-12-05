@@ -255,3 +255,4 @@ class Screen():
         """
         return self.glass.delete_full_lines()
 
+

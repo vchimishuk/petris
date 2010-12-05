@@ -71,6 +71,7 @@ class Petris():
     def run(self):
         """
         Run main application loop.
+        Return True if game was aborted by user, or False if he lose the game.
         """
         figure = None
         exiting = False
@@ -133,7 +134,7 @@ class Petris():
                     self.screen.status = None
             elif ch == ord("q") or ch == ord("Q"):
                 # Quit.
-                return
+                return True
 
             if paused:
                 continue
@@ -148,6 +149,11 @@ class Petris():
                     figure = None
                     fast_falling = False
 
+            # Check for the end of game.
+            if figure == None and self.screen.glass.is_full():
+                # Quit
+                return False
+                                
 
     def _fall_down(self, figure):
         """
@@ -184,13 +190,23 @@ def main():
     petris.init()
     
     try:
-        petris.run()
+        status = petris.run()
+        petris.destroy()
+
+        if not status:
+            print("Ha-ha! You lose.");
+        else:
+            print("Why you don't wonna play with me no more?")
+
+        print()
+        print("Score:" + "{0:>6}".format(petris.screen.score))
+        print("Lines:" + "{0:>6}".format(petris.screen.lines))
+        print("Level:" + "{0:>6}".format(petris.screen.level))
+
     except Exception as err:
         petris.destroy()
         raise err
 
-    petris.destroy()
-    
 
 if __name__ == '__main__':
     main()

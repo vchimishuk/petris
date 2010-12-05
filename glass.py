@@ -131,3 +131,12 @@ class Glass:
                 return False
 
         return True
+
+
+    def is_full(self):
+        """
+        Return True if glass is full. Full glass means end of the game.
+        """
+        for x in range(0, self.width):
+            if self.get_lees_top(x) <= 3:
+                return True
