@@ -63,7 +63,7 @@ class Screen():
         Figure shoud appears at the middle top of the glass.
         """
         figure.y = 0
-        figure.x = math.floor(self.glass.width / 2)
+        figure.x = int(math.floor(self.glass.width / 2))
 
 
     def draw(self, figure):
